@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Jquery CRUD</title>
+    <style>
+        body{
+            margin:0;
+            padding: 0;
+        }
+        .container{
+            padding: 20px;
+        }
+        .modal{
+            display: none;
+            position:absolute;
+            padding: 10px;
+            top: 200px;
+            left: 100px;
+            border:5px solid black;
+            border-radius: 10px;
+            background-color: antiquewhite;
+            justify-content: center;
+        }
+        .modal-header{
+            font-size: 25px;
+            border-bottom: 1px solid black;
+            margin-bottom: 14px;
+        }
+        .exit{
+            float: right;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+    <header>
+        <h1>CRUD JQUERY</h1>
+    </header>
+    <section>
+        <article>
+            <button id="btntambah" data-target="#tambah">Tambah</button>
+            <br>
+            <br>
+            <table class="table" border="1px">
+                <thead>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Action</th>
+                </thead>
+                <tbody class="tbody"></tbody>
+            </table>
+
+
+            <!-- modal tambah -->
+            <div class="modal" id="tambah">
+                <div class="modal-header">
+                    <span>Tambah</span>
+                    <button class="exit" data-target='#tambah'>X</button>
+                </div>
+                <div class="modal-body">
+                    <form action="config/tambah.php" method="POST">
+                        <label for="nama">Nama</label><br>
+                        <input type="text" name="nama"><br>
+                        <label for="alamat">Alamat</label><br>
+                        <input type="text" name="alamat"><br>        
+                </div>
+                <div class="modal-footer">
+                        <br>
+                        <input type="submit" name="submit" value="submit">        
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal" id="lihat">
+                <div class="modal-header">
+                    <span>Lihat</span>
+                    <button class="exit" data-target="#lihat">X</button>
+                </div>
+                <div class="modal-body">
+                    <label for="nama">Nama</label><br>
+                    <input type="text" id="lihatnama" disabled><br>
+                    <label for="alamat">Alamat</label><br>
+                    <input type="text" id="lihatalamat" disabled><br>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+
+            <!-- modal edit -->
+
+            <div class="modal" id="edit">
+                    <div class="modal-header">
+                        <span>Edit</span>
+                        <button class="exit" data-target="#edit">X</button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="id">ID</label><br>
+                        <input type="text" id="editid" disabled><br>
+                        <label for="nama">Nama</label><br>
+                        <input type="text" id="editnama"><br>
+                        <label for="alamat">Alamat</label><br>
+                        <input type="text" id="editalamat"><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="editbutton">Edit</button>
+                    </div>
+                </div>
+
+            <!-- modal edit -->
+
+            <!-- modal hapus -->
+
+            <div class="modal" id="hapus">
+                    <div class="modal-header">
+                        <span>Yakin Mau Ngehapus</span>
+                        <button class="exit" data-target="#hapus">X</button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="id">ID</label><br>
+                        <input type="text" id="hapusid" disabled><br>
+                        <label for="nama">Nama</label><br>
+                        <input type="text" id="hapusnama" disabled><br>
+                        <label for="alamat">Alamat</label><br>
+                        <input type="text" id="hapusalamat" disabled><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="hapusbutton">Hapus</button>
+                    </div>
+                </div>
+            <!-- modal hapus -->
+        </article>
+    </section>      
+</div>
+    <script src="assets/jquery.js"></script>
+    <script>
+        $(document).ready(function(){
+            readAll();
+
+            function readAll(){
+                $('.tbody').html('<span>loading..</span>');
+                $('.tbody').html('');
+                $.ajax({
+                    url:'http://localhost/jquery/config/readAll.php',
+                    dataType:'json',
+                    success:function(result){
+
+                        $.each(result,function(key,value){
+                            $('.tbody').append(`<tr>
+                                    <td>`+value[1]+`</td>
+                                    <td>`+value[2]+`</td>
+                                    <td>
+                                        <button class="btnlihat" data-target="#lihat" data-nama="`+value[1]+`" data-alamat="`+value[2]+`">Lihat</button>
+                                        <button class="btnedit" data-target="#edit" data-nama="`+value[1]+`" data-alamat="`+value[2]+`" data-id="`+value[0]+`">Edit</button>
+                                        <button class="btnhapus" data-target="#hapus" data-nama="`+value[1]+`" data-alamat="`+value[2]+`" data-id="`+value[0]+`">Hapus</button>    
+                                    </td>
+                            </tr>`);
+                        });
+                    }
+                })
+            }
+
+            $('tbody').on('click','button',function(e){
+                if(e.target.className == 'btnlihat'){
+                    let target=$(this).data('target');
+                    $(target).css('display','block');
+                    $('#lihatnama').val($(this).data('nama'));
+                    $('#lihatalamat').val($(this).data('alamat'));
+                }else if(e.target.className =='btnedit'){
+                    let target=$(this).data('target');
+                    $(target).css('display','block');
+                    $('#editid').val($(this).data('id'));
+                    $('#editnama').val($(this).data('nama'));
+                    $('#editalamat').val($(this).data('alamat'));
+                }else if(e.target.className =='btnhapus'){
+                    let target=$(this).data('target');
+                    $(target).css('display','block');
+                    $('#hapusid').val($(this).data('id'));
+                    $('#hapusnama').val($(this).data('nama'));
+                    $('#hapusalamat').val($(this).data('alamat'));
+                }
+            })
+
+            $('.exit').click(function(){
+                let target=$(this).data('target');
+                console.log(target);
+                $(target).css('display','none');
+            })
+            $('#btntambah').click(function(){
+                let target=$(this).data('target');
+                console.log(target);
+                $(target).css('display','block');
+            })
+
+            $('#hapusbutton').on('click',function(){
+                $.ajax({
+                    url:'http://localhost/jquery/config/hapus.php',
+                    type:'POST',
+                    data:{
+                        id:$('#hapusid').val()
+                    },
+                    success:function(result){
+                        console.log(result);
+                        alert('Berhasil Dihapus');
+                        $('#hapus').hide(1000);
+                        readAll();
+                    }
+                })
+            })
+
+            $('#editbutton').on('click',function(){
+                $.ajax({
+                    url:'http://localhost/jquery/config/edit.php',
+                    type:'POST',
+                    data:{
+                        id:$('#editid').val(),
+                        nama:$('#editnama').val(),
+                        alamat:$('#editalamat').val()
+                    },
+                    success:(result)=>{
+                        alert('Berhasil Edit');
+                        $('#edit').hide(1000);
+                        readAll();
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>
